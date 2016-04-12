@@ -63,20 +63,24 @@ public class AdminController {
 	 * index of the current user
 	 */
 	int index;
-	
+
 	/**
 	 * singelton instance of admin
 	 */
 	Admin admin = Admin.getInstance("admin");
-	
+
 	/**
 	 * observable list for users
 	 */
 	public ObservableList<User> users = FXCollections.observableList(admin.getUsers());
 
-	/** event handle for all the buttons
-	 * @param handler ActionEvnet
-	 * @throws IOException input/output exception
+	/**
+	 * event handle for all the buttons
+	 * 
+	 * @param handler
+	 *            ActionEvnet
+	 * @throws IOException
+	 *             input/output exception
 	 */
 	public void handle(ActionEvent handler) throws IOException {
 		Button b = (Button) handler.getSource();
@@ -89,24 +93,25 @@ public class AdminController {
 			newuser.clear();
 		} else if (b == delete) {
 			try {
-				Alert alertBox = Dialog.pop(Alert.AlertType.ERROR, "Delete selected user ", "Are you sure you want to delete this?");
+				Alert alertBox = Dialog.pop(Alert.AlertType.ERROR, "Delete selected user ",
+						"Are you sure you want to delete this?");
 				if (alertBox.getResult() == ButtonType.OK) {
 					int n = listview.getSelectionModel().getSelectedIndex();
 					File f = new File("dat/" + admin.getUsers().get(n).getName());
 					f.delete();
 					admin.getUsers().remove(n);
-					if(n -1 >= 0) {
-						listview.getSelectionModel().select(n-1);
+					if (n - 1 >= 0) {
+						listview.getSelectionModel().select(n - 1);
 					}
-					if(admin.getUsers().size()==0){
-				           listview.getSelectionModel().clearSelection();
-				           users = FXCollections.observableList(admin.getUsers());
-				           listview.setItems(users);
+					if (admin.getUsers().size() == 0) {
+						listview.getSelectionModel().clearSelection();
+						users = FXCollections.observableList(admin.getUsers());
+						listview.setItems(users);
 					} else {
 						users = FXCollections.observableList(admin.getUsers());
 						listview.setItems(users);
 					}
-					if(admin.getUsers().size()==0) {
+					if (admin.getUsers().size() == 0) {
 						foggy(true);
 					} else {
 					}
@@ -120,24 +125,31 @@ public class AdminController {
 			foggy(false);
 
 		} else if (b == save) {
-			if(newuser.getText().replaceAll("\\s+","").equals("")) {
-			} else {
-				User dummy = new User(newuser.getText());
-				if (!admin.getUsers().contains(dummy)) {
-					admin.addUser(dummy);
-					users = FXCollections.observableList(admin.getUsers());
-					listview.setItems(users);
-					alluser.setText("Total users: " + admin.getUsers().size());
-					foggy(false);
+			if (!newuser.getText().isEmpty()) {
+				String uname = newuser.getText().trim();
+				User dummy = new User(uname);
+				if (!uname.contains(" ")) {
+					if (!admin.getUsers().contains(dummy)) {
+						admin.addUser(dummy);
+						users = FXCollections.observableList(admin.getUsers());
+						listview.setItems(users);
+						alluser.setText("Total users: " + admin.getUsers().size());
+						foggy(false);
+					} else {
+						Dialog.pop(Alert.AlertType.ERROR, "conflict", "current user already exists!");
+					}
 				} else {
-					Dialog.pop(Alert.AlertType.ERROR, "conflict", "current user already exists!");
+					Dialog.pop(Alert.AlertType.ERROR, "conflict", "can't have space in username");
 				}
 			}
 		}
 	}
 
-	/**for hiding/showing labels and buttons
-	 * @param b boolean value
+	/**
+	 * for hiding/showing labels and buttons
+	 * 
+	 * @param b
+	 *            boolean value
 	 */
 	public void foggy(boolean b) {
 		newuser.setVisible(b);
@@ -164,11 +176,11 @@ public class AdminController {
 
 				if (in >= 0)
 					index = in;
-				if (!(admin.getUsers().size()==0)) {
+				if (!(admin.getUsers().size() == 0)) {
 					alluser.setText("Total users: " + admin.getUsers().size());
 					curuser.setText("Selected user: " + admin.getUsers().get(index));
 					numalbum.setText("Total albums: " + admin.getUsers().get(index).getAlbums().size());
-				} 
+				}
 			}
 		});
 	}
